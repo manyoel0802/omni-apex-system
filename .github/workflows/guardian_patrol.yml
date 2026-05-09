@@ -1,1 +1,30 @@
+name: Guardian Patrol
 
+on:
+  schedule:
+    # Berjalan setiap 15 menit (Senin-Jumat)
+    # Jam 02:00 - 09:00 UTC sama dengan 09:00 - 16:00 WIB (Jam Bursa)
+    - cron: '*/15 2-9 * * 1-5'
+  workflow_dispatch: # Memungkinkan Kapten menjalankan manual untuk tes
+
+jobs:
+  run-guardian:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Guardian
+        env:
+          # Mengambil token dari brankas Secrets
+          TELE_TOKEN: ${{ secrets.TELE_TOKEN }}
+          TELE_CHAT_ID: ${{ secrets.TELE_CHAT_ID }}
+        run: python guardian.py
